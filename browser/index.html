@@ -5,9 +5,10 @@
   <link href="/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
   <link href="/bootstrap-dark.css" rel="stylesheet" />
   <link href="/style.css" rel="stylesheet" />
+
 </head>
-<body>
-  <div id="main" class="container-fluid">
+<body ng-app='juke'>
+  <div id="main" ng-controller='MainCtrl' class="container-fluid">
 
     <div class="col-xs-2">
       <sidebar>
@@ -20,10 +21,68 @@
       </sidebar>
     </div>
 
-    <div class="col-xs-10"></div>
 
-    <footer></footer>
+
+    <div class="col-xs-10">
+      <div class="album">
+        <p>
+        <h3>{{album.name}}</h3>
+          <img ng-src='{{album.imageUrl}}' class="img-thumbnail">
+        </p>
+        <table class='table'>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Name</th>
+              <th>Artists</th>
+              <th>Genres</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat ='song in album.songs' ng-class='{active: currentSong === song}'>
+              <td>
+                <button class="btn btn-default btn-xs" ng-click='playSong(song._id, song)' ng-hide='song.hidden'>
+                  <span class="glyphicon glyphicon-play"></span>
+                </button>
+              </td>
+              <td>{{song.name}}</td>
+              <td>{{joinArtists(song.artists)}}</td>
+              <td>{{song.genres.join(", ")}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- <div ng-repeat='song in album.songs'>
+        <h3>{{song.name}}</h3>
+      </div> -->
+    </div>
+
+    <footer ng-controller='footCtrl'>
+     <div ng-hide='hideBar'>
+        <div class="pull-left">
+          <button class="btn btn-default" ng-click='prevBtn()'>
+            <span class="glyphicon glyphicon-step-backward"></span>
+          </button>
+          <button class="btn btn-default" ng-hide='hidePause' ng-click='pauseBtn()'>
+            <span class="glyphicon glyphicon-pause"></span>
+          </button>
+            <button class="btn btn-default" ng-hide='showPlay' ng-click='playBtn()'>
+            <span class="glyphicon glyphicon-play"></span>
+            </button>
+          <button class="btn btn-default" ng-click='nextBtn()'>
+            <span class="glyphicon glyphicon-step-forward"></span>
+          </button>
+        </div>
+        <div class="bar">
+          <div class="progress">
+            <div class="progress-bar" ng-style="{width: progress + '%'}"></div>
+          </div>
+        </div>
+      </div>
+    </footer>
 
   </div>
+  <script src='/angular/angular.js'></script>
+  <script src='./controllers/app.js'></script>
 </body>
 </html>
