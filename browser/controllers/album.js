@@ -3,26 +3,28 @@ app.controller('albumCtrl', function($scope, $rootScope, $http){
 	.then(function(response){
 		response.data.imageUrl = '/api/albums/' + response.data._id + '.image';
 		$scope.album = response.data;
-		console.log('the server responded with', response.data)
+		$scope.random = false;
+		// console.log('the server responded with', response.data)
 	}).catch(console.error.bind(console));
-
+	
 	$scope.joinArtists = function (arrOfArtists){
 		var artists = arrOfArtists.map(function(el){
 			return el.name;
 		})
 		return artists.join(", ")
 	}
-	$scope.toggle = function(song) {
+	$scope.toggle = function() {
 		//send currentSong
 		$scope.currentSong.audio = document.createElement('audio');
-		var url = "/api/songs/"+song._id+".audio";
-		$scope.album.songs.forEach(function(s, i) {
-			if (s == song){
+		var url = "/api/songs/"+$scope.currentSong._id+".audio";
+		$scope.songs = $scope.random ? $scope.songArray : $scope.album.songs;
+		// console.log('toggle', $scope.songs, 'random', $scope.random)
+		$scope.songs.forEach(function(s, i) {
+			if (s == $scope.currentSong){
 				s.hidden = true;
 				s.audio.src = url;
 				s.audio.load();
 				s.audio.play();
-
 
 			s.audio.addEventListener('timeupdate', function () {
 			    $scope.progress = 100 * s.audio.currentTime / s.audio.duration;
@@ -38,7 +40,7 @@ app.controller('albumCtrl', function($scope, $rootScope, $http){
 
 	$scope.playSong = function(songId, song){
 		$scope.currentSong = song;
-		$scope.toggle($scope.currentSong);
+		$scope.toggle();
 		$rootScope.$broadcast('songPlay');
 	};
 
@@ -55,19 +57,38 @@ app.controller('albumCtrl', function($scope, $rootScope, $http){
 		});
 	})
 
-
 	$rootScope.$on('next', function (event){
+		$scope.songs = $scope.random ? $scope.songArray : $scope.album.songs;
 		var currentIndex = $scope.currentSong.index;
-		if (currentIndex === $scope.album.songs.length-1) {
-			$scope.currentSong = $scope.album.songs[0];
+		if (currentIndex === $scope.songs.length-1) {
+			$scope.currentSong = $scope.songs[0];
 		}
-		else $scope.currentSong = $scope.album.songs[currentIndex+1]
-		$scope.toggle($scope.currentSong);
+		else $scope.currentSong = $scope.songs[currentIndex+1]
+		$scope.toggle();
 	});
+
 	$rootScope.$on('prev', function (event){
+		$scope.songs = $scope.random ? $scope.songArray : $scope.album.songs;
 		var currentIndex = $scope.currentSong.index;
-		if (!currentIndex) $scope.currentSong = $scope.album.songs[$scope.album.songs.length-1];
-		else $scope.currentSong = $scope.album.songs[currentIndex-1]
-		$scope.toggle($scope.currentSong);
+		if (!currentIndex) $scope.currentSong = $scope.songs[$scope.songs.length-1];
+		else $scope.currentSong = $scope.songs[currentIndex-1]
+		$scope.toggle();
+	});
+
+	$rootScope.$on('random', function (event){
+		// console.log('in', $scope.album.songs);
+		$scope.random = !$scope.random;
+		$scope.songArray = [];
+		$scope.album.songs.forEach(function(el) {
+			$scope.songArray.push(el);
+		})
+
+		var max = $scope.songArray.length - 1
+		for (var i = max; i >= 0; i--) {
+		    var j = Math.floor(Math.random() * (i + 1));
+			var temp = $scope.songArray[i];
+			$scope.songArray[i] = $scope.songArray[j];
+			$scope.songArray[j] = temp;
+		}
 	});
 })

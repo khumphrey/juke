@@ -7,8 +7,8 @@
   <link href="/style.css" rel="stylesheet" />
 
 </head>
-<body ng-app='juke'>
-  <div id="main" ng-controller='MainCtrl' class="container-fluid">
+<body ng-app='juke' ng-controller='MainCtrl' ng-keyup='togglePlay($event)'>
+  <div id="main"  class="container-fluid" >
 
     <div class="col-xs-2">
       <sidebar>
@@ -60,6 +60,9 @@
     <footer ng-controller='songCtrl'>
      <div ng-hide='hideBar'>
         <div class="pull-left">
+          <button class="btn btn-default" ng-click='randomBtn()'>
+            <span class="glyphicon glyphicon-random"></span>
+          </button>
           <button class="btn btn-default" ng-click='prevBtn()'>
             <span class="glyphicon glyphicon-step-backward"></span>
           </button>
@@ -74,8 +77,8 @@
           </button>
         </div>
         <div class="bar">
-          <div class="progress">
-            <div class="progress-bar" ng-style="{width: progress + '%'}"></div>
+          <div class="progress"  ng-click='toggleProgress($event)'>
+            <div class="progress-bar" id="progress-bar" ng-style="{width: progress + '%'}"></div>
           </div>
         </div>
       </div>
