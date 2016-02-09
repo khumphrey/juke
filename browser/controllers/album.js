@@ -1,11 +1,30 @@
-app.controller('albumCtrl', function($scope, $rootScope, $http){
-	$http.get('/api/albums/56b9276fbab14d6104dcf45f')
-	.then(function(response){
-		response.data.imageUrl = '/api/albums/' + response.data._id + '.image';
-		$scope.album = response.data;
-		$scope.random = false;
-		// console.log('the server responded with', response.data)
-	}).catch(console.error.bind(console));
+app.controller('albumCtrl', function($scope, $rootScope, $log, $http){
+	
+	$http.get('/api/albums')
+	.then(response => response.data)
+	.then(albums => {
+		return $http.get('/api/albums/' + albums[3]._id);
+	})
+	.then(response => response.data)
+	.then(album => {
+		$scope.album = album;
+		album.imageUrl = '/api/albums/' + album._id + '.image';
+		$scope.random = false;	
+	})
+	.catch($log.error)
+	//using arrow functions instead of the below
+
+	// .then(function(response) {
+	// 	return $http.get('/api/albums/' + response.data[3]._id);
+	// })
+	// .then(function(response){
+	// 	$scope.album = response.data;
+	// 	response.data.imageUrl = '/api/albums/' + $scope.album._id + '.image';
+	// 	$scope.random = false;
+	// 	// console.log('the server responded with', response.data)
+	// })
+	// .catch($log.error)
+	// alternate -- .catch(console.error.bind(console));
 	
 	$scope.joinArtists = function (arrOfArtists){
 		var artists = arrOfArtists.map(function(el){
@@ -37,6 +56,10 @@ app.controller('albumCtrl', function($scope, $rootScope, $http){
 			}
 		})
 	} 
+
+	$rootScope.$on('currentTimeUpdate', function(event, progressTime) {
+		$scope.currentSong.audio.currentTime = progressTime * $scope.currentSong.audio.duration / 100;
+	})
 
 	$scope.playSong = function(songId, song){
 		$scope.currentSong = song;

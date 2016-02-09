@@ -43,9 +43,9 @@ app.controller('songCtrl', function($scope, $rootScope) {
     }
 
     $rootScope.$on('progressUpdate', function(event, progress) {
-    	console.log('updating progress')
+    	console.log('updating progress', progress)
         $scope.progress = progress;
-        $scope.$digest();
+        $scope.$evalAsync();
     })
 
     $scope.$on('togglePlay', function(event) {
@@ -53,17 +53,29 @@ app.controller('songCtrl', function($scope, $rootScope) {
     	$scope.showPlay ? $scope.pauseBtn() : $scope.playBtn();
     })
 
+    $scope.$on('togglePrev', function(event) {
+    	// console.log("toggling play");
+    	$scope.prevBtn();
+    })
+
+    $scope.$on('toggleNext', function(event) {
+    	// console.log("toggling play");
+    	$scope.nextBtn();
+    })
 
 	$scope.toggleProgress = function(e) {
-	var width = angular.element(e.srcElement)[0].offsetWidth;
+		var width = angular.element(e.srcElement)[0].offsetWidth,
+			progressWidth = 100*e.offsetX/width;
 
-       	// $scope.progress = e.offsetX/width;
-       	//pause
-       	$scope.pauseBtn();
-       	//send to progressupdate
-       	$rootScope.$broadcast('progressUpdate', e.offsetX/width)
-       	//play
-       	$scope.playBtn();
+	       	// $scope.progress = e.offsetX/width;
+	       	//pause
+	       	// $scope.pauseBtn();
+	       	//send to progressupdate
+	    $rootScope.$broadcast('progressUpdate', progressWidth)
+	    $rootScope.$broadcast('currentTimeUpdate', progressWidth)
+
+	       	//play
+       	// $scope.playBtn();
    
 	}
 
