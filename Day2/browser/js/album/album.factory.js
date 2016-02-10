@@ -19,16 +19,13 @@ juke.factory('StatsFactory', function($q) {
         });
     };
     return statsObj;
-
 })
 
 juke.factory('AlbumFactory', function($q, $http, $log, StatsFactory) {
-    var factAlbum = {},
-        factAlbumList = [];
+    var factAlbum = {};
   // load our initial data
   $http.get('/api/albums/')
   .then(function(res) {
-        angular.copy(res.data, factAlbumList);
       return $http.get('/api/albums/' + res.data[1]._id);
       }) // temp: use first
   .then(res => res.data)
@@ -47,5 +44,36 @@ juke.factory('AlbumFactory', function($q, $http, $log, StatsFactory) {
     // console.log(AlbumFactory.totalTime)
   })
   .catch($log.error); // $log service can be turned on and off; also, pre-bound
-  return {album: factAlbum, albumList: factAlbumList}
+  return {album: factAlbum}
+})
+
+juke.factory('AlbumsFactory', function($q, $http, $log, StatsFactory) {
+    var albumList = [];
+    // load our initial data
+    $http.get('/api/albums/')
+        .then(function(res) {
+            angular.copy(res.data, albumList);
+            albumList.forEach(function(album) {
+                    album.imageUrl = '/api/albums/' + album._id + '.image';
+                    // album.songs.forEach(function(song, i) {
+                    //     song.audioUrl = '/api/songs/' + song._id + '.audio';
+                    //     song.albumIndex = i;
+                    // });
+                    // StatsFactory.totalTime(album)
+                    //     .then(function(time) {
+                    //         album.time = Math.floor(time / 60);
+
+                    //     })
+                    // console.log("ind. albums", album);
+                })
+        }) 
+        .catch($log.error); // $log service can be turned on and off; also, pre-bound
+    
+      function getAlbumList () {
+        return albumList;
+      }
+
+    return {
+      albumList: getAlbumList
+    }
 })
