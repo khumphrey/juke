@@ -10,6 +10,7 @@ router.get('/', function (req, res, next) {
   mongoose.model('Album')
   .find(req.query)
   .then(function (albums) {
+    // res.render('../../../index')
     res.json(albums);
   })
   .then(null, next);
